@@ -1,5 +1,8 @@
 package org.esfe.servicio;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class AreaService {
     /**
      * Calcula el área de un rectángulo: Largo * Ancho
