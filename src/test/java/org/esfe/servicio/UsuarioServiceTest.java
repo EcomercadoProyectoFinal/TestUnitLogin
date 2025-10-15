@@ -1,12 +1,14 @@
 package org.esfe.servicio;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UsuarioServiceTest {
-     private UsuarioService usuarioService;
+
+    private UsuarioService usuarioService;
 
     @BeforeEach
     void setUp() {
@@ -15,25 +17,55 @@ public class UsuarioServiceTest {
 
     // Clase interna para mantener todo en un solo archivo (no necesitas crear otra)
     class UsuarioService {
-        public String registrarUsuario(String nombre, String correo, String contrasena) {
+        private String usuarioRegistrado;
+
+        // Simula el registro de un usuario
+        public void registrarUsuario(String nombre, String correo, String contrasena) {
             if (nombre == null || correo == null || contrasena == null) {
                 throw new IllegalArgumentException("Los campos no pueden ser nulos");
             }
-            return "Usuario registrado: " + nombre + ", " + correo;
+            this.usuarioRegistrado = nombre + ", " + correo;
+        }
+
+        // Simula la obtención del usuario registrado
+        public String obtenerUsuario() {
+            return this.usuarioRegistrado;
         }
     }
 
     @Test
-    void registrarUsuario_DebeRegistrarCorrectamente() {
-        String nombre = "Cristian";
-        String correo = "cristian@correo.com";
+    void validarRegistroYObtencionUsuario_DebeCoincidirNombreYCorreo() {
+        // Arrange
+        String nombreEsperado = "Cristian";
+        String correoEsperado = "cristian@correo.com";
         String contrasena = "12345";
 
-        String resultado = usuarioService.registrarUsuario(nombre, correo, contrasena);
+        // Act
+        usuarioService.registrarUsuario(nombreEsperado, correoEsperado, contrasena);
+        String usuarioObtenido = usuarioService.obtenerUsuario();
 
-        System.out.println("TEST 1: " + resultado);
+        System.out.println("TEST: Usuario registrado -> " + nombreEsperado + ", " + correoEsperado);
+        System.out.println("TEST: Usuario obtenido -> " + usuarioObtenido);
 
-        assertTrue(resultado.contains(nombre), "El nombre debe estar en el mensaje");
-        assertTrue(resultado.contains(correo), "El correo debe estar en el mensaje");
+        // Assert
+        assertTrue(usuarioObtenido.contains(nombreEsperado), "El nombre debe coincidir");
+        assertTrue(usuarioObtenido.contains(correoEsperado), "El correo debe coincidir");
+    }
+
+    @Test
+    void registrarUsuario_DebeLanzarExcepcionSiCamposSonNulos() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            usuarioService.registrarUsuario(null, "correo@test.com", "1234");
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            usuarioService.registrarUsuario("Juan", null, "1234");
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            usuarioService.registrarUsuario("Juan", "correo@test.com", null);
+        });
+
+        System.out.println("TEST: Se lanzaron excepciones correctamente al faltar datos.");
     }
 }
