@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductoRepository {
     Producto save(Producto producto);
+    void deleteById(Long id);
 }
