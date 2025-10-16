@@ -1,50 +1,45 @@
 package org.esfe.servicio;
 
+import org.esfe.model.Rol;
+import org.esfe.repository.RolRepository;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class RolServiceTest {
-    
-     private RolService rolService;
+
+    @Mock
+    private RolRepository rolRepository;
+
+    @InjectMocks
+    private RolService rolService;
 
     @BeforeEach
     void setUp() {
-        rolService = new RolService();
-    }
-
-    // Clase interna para mantener todo dentro del mismo archivo (sin necesidad de otra clase)
-    class RolService {
-        private String rolGuardado;
-
-        // Simula la creación de un rol
-        public void crearRol(String nombreRol) {
-            if (nombreRol == null || nombreRol.isEmpty()) {
-                throw new IllegalArgumentException("El nombre del rol no puede estar vacío");
-            }
-            this.rolGuardado = nombreRol;
-        }
-
-        // Simula la obtención del rol
-        public String obtenerRol() {
-            return this.rolGuardado;
-        }
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void validarCreacionYObtencionDeRol_DebeCoincidirElNombre() {
-        // Arrange (Preparar datos)
-        String rolEsperado = "Administrador";
+    void crearRol_DebeGuardarYDevolverRol() {
+        Rol rolEsperado = new Rol("Administrador", "Rol con todos los permisos");
 
-        // Act (Ejecutar acciones)
-        rolService.crearRol(rolEsperado);
-        String rolObtenido = rolService.obtenerRol();
+        when(rolRepository.save(any(Rol.class))).thenReturn(rolEsperado);
 
-        System.out.println("TEST: Rol creado -> " + rolEsperado);
-        System.out.println("TEST: Rol obtenido -> " + rolObtenido);
+        Rol rolObtenido = rolService.crearRol(rolEsperado);
 
-        // Assert (Verificar resultados)
-        assertEquals(rolEsperado, rolObtenido, "El rol obtenido debe ser igual al creado");
+        System.out.println("TEST: Rol creado -> " + rolEsperado.getNombre());
+        System.out.println("TEST: Rol obtenido -> " + rolObtenido.getNombre());
+
+        assertEquals(rolEsperado.getNombre(), rolObtenido.getNombre());
+        verify(rolRepository, times(1)).save(any(Rol.class));
     }
 }
